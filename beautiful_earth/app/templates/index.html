@@ -6,7 +6,7 @@
 
     <!-- Reference to the Bing Maps SDK -->
     <script type='text/javascript'
-        src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkAArX7aOM5zd5TdIL80WzdoycB1DnM1DxyNuCDnqWsdD7AQXOGz4Cb8-a0iQCXv'
+        src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkAArX7aOM5zd5TdIL80WzdoycB1DnM1DxyNuCDnqWsdD7AQXOGz4Cb8-a0iQCXv'
         async defer></script>
 </head>
 
@@ -14,7 +14,7 @@
     <!-- <img id="photo" /> -->
     <script type='text/javascript'>
         function GetMap() {
-            var map = new Microsoft.Maps.Map('#myMap');
+            var map = new Microsoft.Maps.Map('#myMap', { minZoom: 10, maxZoom: 12 });
 
             //Add your post map load code here.             
             var quadKeyToTileLocRect = {};
@@ -43,7 +43,13 @@
                     
                     // Create POST request
                     var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "http://127.0.0.1:5000/image", true);
+
+                    // Production
+                    xhr.open("POST", "https://beautifulearth.azurewebsites.net/image", true);
+
+                    // Development
+                    //xhr.open("POST", "http://127.0.0.1:5000/image", true);
+
                     xhr.setRequestHeader('Content-Type', 'application/json')
 
                     // Ask for the result as an ArrayBuffer.
