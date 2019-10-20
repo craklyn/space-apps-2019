@@ -24,19 +24,119 @@
         </style>    
 </head>
 <body>
+
+    <img id="photo"/>
     <script type='text/javascript'>
     function GetMap()
     {
         var map = new Microsoft.Maps.Map('#myMap');
 
         //Add your post map load code here.
+
+        //Load the Spatial Math module.
+        Microsoft.Maps.loadModule("Microsoft.Maps.SpatialMath", function () {
+            showMapTileBounds();
+            //Recaulte the map tiles bounds everytime the map moves.
+            Microsoft.Maps.Events.addHandler(map, 'viewchangeend', showMapTileBounds);
+        });
+
+        async function showMapTileBounds() {
+            map.entities.clear();
+            //Get a list of all the tiles in the current map view.
+            var tiles = Microsoft.Maps.SpatialMath.Tiles.getTilesInBounds(map.getBounds(), map.getZoom());
+            for (var i = 0; i < tiles.length; i++) {
+                var quadKey = tiles[i].quadKey;
+                console.log("Quadkey:" + quadKey);
+
+                var imageUrl = "https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/"+quadKey+"?mkt=en-US&it=A,G,RL&shading=hill&n=z&og=526&c4w=1"
+
+                // Simulate a call to Dropbox or other service that can
+                // return an image as an ArrayBuffer.
+                var xhr = new XMLHttpRequest();
+
+                // Use JSFiddle logo as a sample image to avoid complicating
+                // this example with cross-domain issues.
+                xhr.open( "POST", "http://127.0.0.1:5000/image", true );
+
+                xhr.setRequestHeader('Content-Type', 'application/json')
+
+                // Ask for the result as an ArrayBuffer.
+                xhr.responseType = "arraybuffer";
+
+                xhr.onload = function( e ) {
+                    // Obtain a blob: URL for the image data.
+                    var arrayBufferView = new Uint8Array( this.response );
+                    var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+                    var urlCreator = window.URL || window.webkitURL;
+                    var imageUrl = urlCreator.createObjectURL( blob );
+                    var img = document.querySelector( "#photo" );
+                    img.src = imageUrl;
+                };
+
+                xhr.send(JSON.stringify({ "quadKey": quadKey, "imageUrl": imageUrl}));
+
+                //Calculate the bounding rectangle of the tile.
+                var tileLocRect = Microsoft.Maps.SpatialMath.Tiles.tileToLocationRect(tiles[i]);
+
+                //Create a polygon for the tile and add it to the map.
+                var poly = Microsoft.Maps.SpatialMath.locationRectToPolygon(tileLocRect);
+                map.entities.push(poly);
+
+                //Add a pushpin with the quadkey value set as the title.
+                var pin = new Microsoft.Maps.Pushpin(tileLocRect.center, {
+                    title: tiles[i].quadKey
+                });
+                map.entities.push(pin);
+            }
+        }
     }
+    
     </script>
     <div id="myMap" style="position:relative;width:600px;height:400px;"></div>
 
+    <!-- =================== Old code to send a request ============================= -->
 
-        <!-- Azure Maps -->
-        <!-- <div id="myMap"></div>
+    <!-- // let response = await fetch("http://127.0.0.1:5000/image");
+    // if (response.ok) { // if HTTP-status is 200-299
+    //      // get the response body (the method explained below)
+    //     let coolResponse = await response; //.arrayBuffer();
+    //     console.log(coolResponse);                  
+
+    //     var arrayBufferView = new Uint8Array( coolResponse );
+    //     var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );  
+    //     console.log(blob);                  
+    //     var urlCreator = window.URL || window.webkitURL;
+    //     var imageUrl = urlCreator.createObjectURL( blob );
+    //     console.log(imageUrl);
+    //     var img = document.querySelector( "#photo" );
+    //     img.src = imageUrl;
+
+    // } else {
+    //     alert("HTTP-Error: " + response.status);
+    // } -->
+
+    <!-- ==================== Old code to look at ============================ -->
+
+    <!-- <script type='text/javascript'>
+    // function sleep(ms) {
+    //     return new Promise(resolve => setTimeout(resolve, ms));
+    // }
+    // async function demo() {
+    //     console.log('Taking a break...');
+    //     await sleep(2000);
+    //         var resources = window.performance.getEntriesByType("resource");
+    //     resources.forEach(function (resource) {
+    //         console.log(resource);
+    //     });
+    // }
+    // demo();
+
+    </script> -->
+
+    <!-- ================================================ -->
+
+        <!-- Azure Maps
+        <div id="myMap"></div>
         <script type="text/javascript">
         //Create an instance of the map control and set some options.
         var map = new atlas.Map('myMap', {
