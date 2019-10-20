@@ -1,8 +1,54 @@
+<!DOCTYPE html>
 <html>
     <head>
-        <title>{{ title }} - Microblog</title>
-    </head>
-    <body>
-        <h1>Hello, {{ user.username }}!</h1>
+        <title>{{ title }}</title>
+
+        <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+        <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
+        <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+
+        <!-- Reference to the Bing Maps SDK -->
+        <script type='text/javascript'
+            src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkAArX7aOM5zd5TdIL80WzdoycB1DnM1DxyNuCDnqWsdD7AQXOGz4Cb8-a0iQCXv' 
+            async defer></script>
+
+        <style>
+            html, body {
+                margin: 0;
+            }
+
+            #myMap {
+                height: 100vh;
+                width: 100vw;
+            }
+        </style>    
+</head>
+<body>
+    <script type='text/javascript'>
+    function GetMap()
+    {
+        var map = new Microsoft.Maps.Map('#myMap');
+
+        //Add your post map load code here.
+    }
+    </script>
+    <div id="myMap" style="position:relative;width:600px;height:400px;"></div>
+
+
+        <!-- Azure Maps -->
+        <!-- <div id="myMap"></div>
+        <script type="text/javascript">
+        //Create an instance of the map control and set some options.
+        var map = new atlas.Map('myMap', {
+            center: [-122.33, 47.6],
+            zoom: 12,
+            language: 'en-US',
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: 'vpNJNb5Nn-pUu43qtJhlf_RM5A6_80Gd6qSxBIcQqBs'
+            }
+        });
+        </script> -->
+
     </body>
 </html>
