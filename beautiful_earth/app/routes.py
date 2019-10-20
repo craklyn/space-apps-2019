@@ -15,7 +15,6 @@ def image():
     json = request.json
     imageUrl = json['imageUrl']
     quadKey = json['quadKey']
-    tileLocRect = json['tileLocRect']
 
     # TODO - Run model on this image URL
 

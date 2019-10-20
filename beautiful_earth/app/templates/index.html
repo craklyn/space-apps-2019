@@ -71,7 +71,7 @@
                         var quadKeyFromResponseHeader = this.getResponseHeader("X-quadKey");
                         var tileLocRectInCallback = quadKeyToTileLocRect[quadKeyFromResponseHeader];
 
-                        console.log("quadKeyFromResponseHeader: " + quadKeyFromResponseHeader + " | tileLocRectInCallback: " + tileLocRectInCallback);
+                        // console.log("quadKeyFromResponseHeader: " + quadKeyFromResponseHeader + " | tileLocRectInCallback: " + tileLocRectInCallback);
 
                         // Obtain a blob: URL for the image data.
                         var arrayBufferView = new Uint8Array(this.response);
@@ -80,13 +80,12 @@
                         // we now have an image blob - this is where we would set it on the map as a tile
         
 
-                        var curLocation = Microsoft.Maps.SpatialMath.Tiles.tileToLocationRect(tiles[i]);
                         var urlCreator = window.URL || window.webkitURL;
                         var imageUrl = urlCreator.createObjectURL(blob);
                         var img = document.querySelector("#photo");
                         img.src = imageUrl;
 
-                        placeQuad(imageUrl, curLocation);
+                        placeQuad(imageUrl, String(tileLocRectInCallback));
                         console.log("Bai test 2" + imageUrl);
                     };
 
@@ -100,7 +99,7 @@
                 TopographicOverlay.prototype = new Microsoft.Maps.CustomOverlay();
 
                 var bounds = Microsoft.Maps.LocationRect.fromString(location);
-                var imageSrc = 'image';
+                var imageSrc = image;
 
                 //Define a constructor for the custom overlay class.
                 function TopographicOverlay(bounds, image) {
