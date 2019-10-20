@@ -9,7 +9,7 @@ Set up
 To run locally
     Open the beautiful_earth folder in VSCode 
     Click terminal -> new terminal
-    export FLASK_APP=main.py
+    export FLASK_APP=application.py
     Flask run
 
 To deploy:

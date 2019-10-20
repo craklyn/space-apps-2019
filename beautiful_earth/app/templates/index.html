@@ -45,10 +45,10 @@
                     var xhr = new XMLHttpRequest();
 
                     // Production
-                    xhr.open("POST", "https://beautifulearth.azurewebsites.net/image", true);
+                    //xhr.open("POST", "https://beautifulearth.azurewebsites.net/image", true);
 
                     // Development
-                    //xhr.open("POST", "http://127.0.0.1:5000/image", true);
+                    xhr.open("POST", "http://127.0.0.1:5000/image", true);
 
                     xhr.setRequestHeader('Content-Type', 'application/json')
 
