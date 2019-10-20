@@ -4,34 +4,17 @@
 <head>
     <title>{{ title }}</title>
 
-    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
-    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
-    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
-
     <!-- Reference to the Bing Maps SDK -->
     <script type='text/javascript'
-        src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkAArX7aOM5zd5TdIL80WzdoycB1DnM1DxyNuCDnqWsdD7AQXOGz4Cb8-a0iQCXv'
+        src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkAArX7aOM5zd5TdIL80WzdoycB1DnM1DxyNuCDnqWsdD7AQXOGz4Cb8-a0iQCXv'
         async defer></script>
-
-    <style>
-        html,
-        body {
-            margin: 0;
-        }
-
-        #myMap {
-            height: 100vh;
-            width: 100vw;
-        }
-    </style>
 </head>
 
 <body>
-
-    <img id="photo" />
+    <!-- <img id="photo" /> -->
     <script type='text/javascript'>
         function GetMap() {
-            var map = new Microsoft.Maps.Map('#myMap');
+            var map = new Microsoft.Maps.Map('#myMap', { minZoom: 10, maxZoom: 12 });
 
             //Add your post map load code here.             
             var quadKeyToTileLocRect = {};
@@ -60,7 +43,13 @@
                     
                     // Create POST request
                     var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "http://127.0.0.1:5000/image", true);
+
+                    // Production
+                    xhr.open("POST", "https://beautifulearth.azurewebsites.net/image", true);
+
+                    // Development
+                    //xhr.open("POST", "http://127.0.0.1:5000/image", true);
+
                     xhr.setRequestHeader('Content-Type', 'application/json')
 
                     // Ask for the result as an ArrayBuffer.
@@ -75,18 +64,14 @@
 
                         // Obtain a blob: URL for the image data.
                         var arrayBufferView = new Uint8Array(this.response);
-                        var blob = new Blob([arrayBufferView], { type: "image/jpeg" });
-
-                        // we now have an image blob - this is where we would set it on the map as a tile
-        
-
+                        var blob = new Blob([arrayBufferView], { type: "image/jpeg" });        
                         var urlCreator = window.URL || window.webkitURL;
                         var imageUrl = urlCreator.createObjectURL(blob);
-                        var img = document.querySelector("#photo");
-                        img.src = imageUrl;
+                        
+                        // var img = document.querySelector("#photo");
+                        // img.src = imageUrl;
 
                         placeQuad(imageUrl, String(tileLocRectInCallback));
-                        console.log("Bai test 2" + imageUrl);
                     };
 
                     xhr.send(JSON.stringify({ "quadKey": quadKey, "imageUrl": imageUrl }));
@@ -94,7 +79,6 @@
             }
 
             function placeQuad(image, location) {
-
                 //Define a custom overlay class that inherts from the CustomOverlay class.
                 TopographicOverlay.prototype = new Microsoft.Maps.CustomOverlay();
 
@@ -140,69 +124,10 @@
 
                 //Add the custom overlay to the map.
                 map.layers.insert(overlay);
-
             }
         }
     </script>
 
     <div id="myMap" style="position: absolute;width:100%;height:100%;"></div>
-
-    <!-- =================== Old code to send a request ============================= -->
-
-    <!-- // let response = await fetch("http://127.0.0.1:5000/image");
-    // if (response.ok) { // if HTTP-status is 200-299
-    //      // get the response body (the method explained below)
-    //     let coolResponse = await response; //.arrayBuffer();
-    //     console.log(coolResponse);                  
-
-    //     var arrayBufferView = new Uint8Array( coolResponse );
-    //     var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );  
-    //     console.log(blob);                  
-    //     var urlCreator = window.URL || window.webkitURL;
-    //     var imageUrl = urlCreator.createObjectURL( blob );
-    //     console.log(imageUrl);
-    //     var img = document.querySelector( "#photo" );
-    //     img.src = imageUrl;
-
-    // } else {
-    //     alert("HTTP-Error: " + response.status);
-    // } -->
-
-    <!-- ==================== Old code to look at ============================ -->
-
-    <!-- <script type='text/javascript'>
-    // function sleep(ms) {
-    //     return new Promise(resolve => setTimeout(resolve, ms));
-    // }
-    // async function demo() {
-    //     console.log('Taking a break...');
-    //     await sleep(2000);
-    //         var resources = window.performance.getEntriesByType("resource");
-    //     resources.forEach(function (resource) {
-    //         console.log(resource);
-    //     });
-    // }
-    // demo();
-
-    </script> -->
-
-    <!-- ================================================ -->
-
-    <!-- Azure Maps
-        <div id="myMap"></div>
-        <script type="text/javascript">
-        //Create an instance of the map control and set some options.
-        var map = new atlas.Map('myMap', {
-            center: [-122.33, 47.6],
-            zoom: 12,
-            language: 'en-US',
-            authOptions: {
-                authType: 'subscriptionKey',
-                subscriptionKey: 'vpNJNb5Nn-pUu43qtJhlf_RM5A6_80Gd6qSxBIcQqBs'
-            }
-        });
-        </script> -->
-
 </body>
-
 </html>
