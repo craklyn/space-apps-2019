@@ -28,58 +28,12 @@
 
 <body>
 
-    <img id="photo"/>
+    <img id="photo" />
     <script type='text/javascript'>
         function GetMap() {
             var map = new Microsoft.Maps.Map('#myMap');
 
             //Add your post map load code here.
-
-            //Define a custom overlay class that inherts from the CustomOverlay class.
-            TopographicOverlay.prototype = new Microsoft.Maps.CustomOverlay();
-
-            var bounds = Microsoft.Maps.LocationRect.fromString("47.754097979680026,-122.6953125,47.63578359086485,-122.51953125");
-            var imageSrc = 'https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/02123002130?mkt=en-US&it=G,BX,RL&shading=hill&n=z&og=526&c4w=1&cstl=rd';
-
-            //Define a constructor for the custom overlay class.
-            function TopographicOverlay(bounds, image) {
-                this.bounds = bounds;
-                this.image = image;
-            }
-            //Implement the onAdd method to set up DOM elements, and use setHtmlElement to bind it with the overlay.
-            TopographicOverlay.prototype.onAdd = function () {
-                img = document.createElement('img');
-                img.src = this.image;
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.position = 'absolute';
-                this.setHtmlElement(img);
-            };
-            TopographicOverlay.prototype.onLoad = function () {
-                repositionOverlay();
-
-                //Update the position of the image when the view changes.
-                Microsoft.Maps.Events.addHandler(map, 'viewchange', function () {
-                    repositionOverlay();
-                });
-            }
-            function repositionOverlay() {
-                var topLeft = map.tryLocationToPixel(bounds.getNorthwest(), Microsoft.Maps.PixelReference.control);
-                var bottomRight = map.tryLocationToPixel(bounds.getSoutheast(), Microsoft.Maps.PixelReference.control);
-                if (topLeft && bottomRight) {
-                    img.style.left = topLeft.x + 'px';
-                    img.style.top = topLeft.y + 'px';
-                    img.style.width = (bottomRight.x - topLeft.x) + 'px';
-                    img.style.width = (bottomRight.x - topLeft.x) + 'px';
-                    img.style.height = (bottomRight.y - topLeft.y) + 'px';
-                }
-            }
-
-            //Implement the new custom overlay class. 
-            var overlay = new TopographicOverlay(bounds, imageSrc);
-
-            //Add the custom overlay to the map.
-            map.layers.insert(overlay);
 
             //Load the Spatial Math module.
             Microsoft.Maps.loadModule("Microsoft.Maps.SpatialMath", function () {
@@ -88,38 +42,43 @@
                 //Recalculate the map tiles bounds everytime the map moves.
                 Microsoft.Maps.Events.addHandler(map, 'viewchangeend', showMapTileBounds);
             });
-            
+
             async function showMapTileBounds() {
                 map.entities.clear();
                 //Get a list of all the tiles in the current map view.
                 var tiles = Microsoft.Maps.SpatialMath.Tiles.getTilesInBounds(map.getBounds(), map.getZoom());
                 for (var i = 0; i < tiles.length; i++) {
                     var quadKey = tiles[i].quadKey;
-                    var imageUrl = "https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/"+quadKey+"?mkt=en-US&it=A,G,RL&shading=hill&n=z&og=526&c4w=1"
+                    var imageUrl = "https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/" + quadKey + "?mkt=en-US&it=A,G,RL&shading=hill&n=z&og=526&c4w=1"
 
                     // Create POST request
                     var xhr = new XMLHttpRequest();
-                    xhr.open( "POST", "http://127.0.0.1:5000/image", true );
+                    xhr.open("POST", "http://127.0.0.1:5000/image", true);
                     xhr.setRequestHeader('Content-Type', 'application/json')
 
                     // Ask for the result as an ArrayBuffer.
                     xhr.responseType = "arraybuffer";
+                    console.log("bailey tea");
 
                     // Set a callback that will get called when the call is returned from the service
-                    xhr.onload = function( e ) {
+                    xhr.onload = function (e) {
                         // Obtain a blob: URL for the image data.
-                        var arrayBufferView = new Uint8Array( this.response );
-                        var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+                        var arrayBufferView = new Uint8Array(this.response);
+                        var blob = new Blob([arrayBufferView], { type: "image/jpeg" });
 
                         // we now have an image blob - this is where we would set it on the map as a tile
 
+                        var curLocation = Microsoft.Maps.SpatialMath.Tiles.tileToLocationRect(tiles[i]);
                         var urlCreator = window.URL || window.webkitURL;
-                        var imageUrl = urlCreator.createObjectURL( blob );
-                        var img = document.querySelector( "#photo" );
+                        var imageUrl = urlCreator.createObjectURL(blob);
+                        var img = document.querySelector("#photo");
                         img.src = imageUrl;
+
+                        placeQuad(imageUrl, curLocation);
+                        console.log("Bai test 2" + imageUrl);
                     };
 
-                    xhr.send(JSON.stringify({ "quadKey": quadKey, "imageUrl": imageUrl}));
+                    xhr.send(JSON.stringify({ "quadKey": quadKey, "imageUrl": imageUrl }));
 
                     //Calculate the bounding rectangle of the tile.
                     var tileLocRect = Microsoft.Maps.SpatialMath.Tiles.tileToLocationRect(tiles[i]);
@@ -134,8 +93,58 @@
                     });
                     map.entities.push(pin);
 
-                    console.log("Bailey test " + tileLocRect);
+                    // console.log("Bailey test " + tileLocRect);
                 }
+            }
+
+            function placeQuad(image, location) {
+
+                //Define a custom overlay class that inherts from the CustomOverlay class.
+                TopographicOverlay.prototype = new Microsoft.Maps.CustomOverlay();
+
+                var bounds = Microsoft.Maps.LocationRect.fromString(location);
+                var imageSrc = 'image';
+
+                //Define a constructor for the custom overlay class.
+                function TopographicOverlay(bounds, image) {
+                    this.bounds = bounds;
+                    this.image = image;
+                }
+                //Implement the onAdd method to set up DOM elements, and use setHtmlElement to bind it with the overlay.
+                TopographicOverlay.prototype.onAdd = function () {
+                    img = document.createElement('img');
+                    img.src = this.image;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.position = 'absolute';
+                    this.setHtmlElement(img);
+                };
+                TopographicOverlay.prototype.onLoad = function () {
+                    repositionOverlay();
+
+                    //Update the position of the image when the view changes.
+                    Microsoft.Maps.Events.addHandler(map, 'viewchange', function () {
+                        repositionOverlay();
+                    });
+                }
+                function repositionOverlay() {
+                    var topLeft = map.tryLocationToPixel(bounds.getNorthwest(), Microsoft.Maps.PixelReference.control);
+                    var bottomRight = map.tryLocationToPixel(bounds.getSoutheast(), Microsoft.Maps.PixelReference.control);
+                    if (topLeft && bottomRight) {
+                        img.style.left = topLeft.x + 'px';
+                        img.style.top = topLeft.y + 'px';
+                        img.style.width = (bottomRight.x - topLeft.x) + 'px';
+                        img.style.width = (bottomRight.x - topLeft.x) + 'px';
+                        img.style.height = (bottomRight.y - topLeft.y) + 'px';
+                    }
+                }
+
+                //Implement the new custom overlay class. 
+                var overlay = new TopographicOverlay(bounds, imageSrc);
+
+                //Add the custom overlay to the map.
+                map.layers.insert(overlay);
+
             }
         }
     </script>
@@ -183,7 +192,7 @@
 
     <!-- ================================================ -->
 
-        <!-- Azure Maps
+    <!-- Azure Maps
         <div id="myMap"></div>
         <script type="text/javascript">
         //Create an instance of the map control and set some options.
