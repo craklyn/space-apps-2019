@@ -38,8 +38,8 @@
             //Define a custom overlay class that inherts from the CustomOverlay class.
             TopographicOverlay.prototype = new Microsoft.Maps.CustomOverlay();
 
-            var bounds = Microsoft.Maps.LocationRect.fromCorners(new Microsoft.Maps.Location(40.5, -123.5), new Microsoft.Maps.Location(40, -123));
-            var imageSrc = 'https://bingmapsisdk.blob.core.windows.net/isdksamples/topographicMap.gif';
+            var bounds = Microsoft.Maps.LocationRect.fromString("47.754097979680026,-122.6953125,47.63578359086485,-122.51953125");
+            var imageSrc = 'https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/02123002130?mkt=en-US&it=G,BX,RL&shading=hill&n=z&og=526&c4w=1&cstl=rd';
 
             //Define a constructor for the custom overlay class.
             function TopographicOverlay(bounds, image) {
@@ -133,6 +133,8 @@
                         title: tiles[i].quadKey
                     });
                     map.entities.push(pin);
+
+                    console.log("Bailey test " + tileLocRect);
                 }
             }
         }
